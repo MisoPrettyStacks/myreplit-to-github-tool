@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replit → GitHub Converter</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --container-bg: #161b22;
+            --text-color: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-color: #238636;
+            --accent-hover: #2ea043;
+            --border-color: #30363d;
+            --input-bg: #010409;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .result-box {
+            margin-top: 24px;
+            display: none;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .result-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 4px 8px;
+            font-size: 12px;
+            width: auto;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        pre {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 0;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Replit → GitHub Converter</h1>
+    <p class="subtitle">Format your Replit project data into clean GitHub-ready structures</p>
+    
+    <div class="form-group">
+        <label for="repoName">Repository Name</label>
+        <input type="text" id="repoName" placeholder="e.g., my-awesome-project">
+    </div>
+
+    <div class="form-group">
+        <label for="replitUrl">Replit App URL</label>
+        <input type="text" id="replitUrl" placeholder="https://your-repl--username.replit.app/">
+    </div>
+
+    <div class="form-group">
+        <label for="description">Project Description</label>
+        <textarea id="description" placeholder="Describe what this project does..."></textarea>
+    </div>
+
+    <button onclick="processConversion()">Convert & Generate Configuration</button>
+
+    <div class="result-box" id="resultBox">
+        <div class="result-header">
+            <span class="result-title">Generated README.md Markdown:</span>
+            <button class="copy-btn" id="copyBtn" onclick="copyToClipboard()">Copy Code</button>
+        </div>
+        <pre id="outputCode"></pre>
+    </div>
+</div>
+
+<script>
+    function processConversion() {
+        const repoName = document.getElementById('repoName').value.trim() || 'replit-project';
+        const replitUrl = document.getElementById('replitUrl').value.trim() || '#';
+        const description = document.getElementById('description').value.trim() || 'A project converted from Replit.';
+
+        // Generate standard clean markdown architecture for GitHub repositories
+        const markdownOutput = `# ${repoName}
+
+${description}
+
+## Replit Live Deployment
+This project was originally built and hosted on Replit. You can view the live running deployment directly via the following link:
+* **Live Demo:** [${replitUrl}](${replitUrl})
+
+## How to Run Locally
+
+1. **Clone the repository:**
+   \`\`\`bash
+   git clone https://github.com{repoName}.git
+   cd ${repoName}
+   \`\`\`
+
+2. **Install Dependencies:**
+   Check the setup files (\`package.json\`, \`requirements.txt\`, or \`.replit\`) to install required packages.
+
+3. **Start the Application:**
+   Run the main execution script defined in your configuration.`;
+
+        document.getElementById('outputCode').textContent = markdownOutput;
+        document.getElementById('resultBox').style.display = 'block';
+        
+        // Reset copy button status
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.textContent = 'Copy Code';
+    }
+
+    function copyToClipboard() {
+        const codeText = document.getElementById('outputCode').textContent;
+        navigator.clipboard.writeText(codeText).then(() => {
+            const copyBtn = document.getElementById('copyBtn');
+            copyBtn.textContent = 'Copied!';
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    }
+</script>
+
+</body>
+</html>
